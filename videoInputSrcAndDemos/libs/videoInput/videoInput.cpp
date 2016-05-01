@@ -79,10 +79,10 @@ EXTERN_C const IID IID_ISampleGrabber;
 EXTERN_C const CLSID CLSID_NullRenderer;
 
 //use videoInput::setVerbose to change
-static bool verbose = true;
+static bool verbose = false;
 
 //use videoInput::setComMultiThreaded to change
-static bool VI_COM_MULTI_THREADED = false;
+static bool VI_COM_MULTI_THREADED = true;
 
 ///////////////////////////  HANDY FUNCTIONS  /////////////////////////////
 
@@ -963,6 +963,48 @@ int videoInput::getSize(int id){
 
 }
 
+// ----------------------------------------------------------------------
+// directly return buffer
+// ----------------------------------------------------------------------
+
+unsigned char* videoInput::getPixelPointer(int id){
+
+	if(isDeviceSetup(id)){
+		if(bCallback){
+			//callback capture
+
+			DWORD result = WaitForSingleObject(VDList[id]->sgCallback->hEvent, 1000);
+			if( result != WAIT_OBJECT_0) return false;
+
+			unsigned char * src = VDList[id]->sgCallback->pixels;
+			ResetEvent(VDList[id]->sgCallback->hEvent);
+			VDList[id]->sgCallback->newFrame = false;
+
+			return src;
+		}
+		else{
+			//regular capture method
+			long bufferSize = VDList[id]->videoSize;
+			HRESULT hr = VDList[id]->pGrabber->GetCurrentBuffer(&bufferSize, (long *)VDList[id]->pBuffer);
+			if(hr==S_OK){
+				int numBytes = VDList[id]->videoSize;
+				if (numBytes == bufferSize){
+
+					unsigned char * src = (unsigned char * )VDList[id]->pBuffer;
+					return src;
+				}else{
+					if(verbose)printf("ERROR: GetPixelPointer() - bufferSizes do not match!\n");
+					return NULL;
+				}
+			}else{
+				if(verbose)printf("ERROR: GetPixelPointer() - Unable to grab frame for device %i\n", id);
+				return NULL;
+			}
+		}
+	}
+
+	return NULL;
+}
 
 // ----------------------------------------------------------------------
 // Uses a supplied buffer
@@ -1638,25 +1680,25 @@ void videoInput::getMediaSubtypeAsString(GUID type, char * typeAsString){
 
 	static const int maxStr = 8;
 	char tmpStr[maxStr];
-	if( type == MEDIASUBTYPE_RGB24) strncpy(tmpStr, "RGB24", maxStr);
-	else if(type == MEDIASUBTYPE_RGB32) strncpy(tmpStr, "RGB32", maxStr);
-	else if(type == MEDIASUBTYPE_RGB555)strncpy(tmpStr, "RGB555", maxStr);
-	else if(type == MEDIASUBTYPE_RGB565)strncpy(tmpStr, "RGB565", maxStr);
-	else if(type == MEDIASUBTYPE_YUY2) strncpy(tmpStr, "YUY2", maxStr);
-	else if(type == MEDIASUBTYPE_YVYU) strncpy(tmpStr, "YVYU", maxStr);
-	else if(type == MEDIASUBTYPE_YUYV) strncpy(tmpStr, "YUYV", maxStr);
-	else if(type == MEDIASUBTYPE_IYUV) strncpy(tmpStr, "IYUV", maxStr);
-	else if(type == MEDIASUBTYPE_UYVY) strncpy(tmpStr, "UYVY", maxStr);
-	else if(type == MEDIASUBTYPE_YV12) strncpy(tmpStr, "YV12", maxStr);
-	else if(type == MEDIASUBTYPE_YVU9) strncpy(tmpStr, "YVU9", maxStr);
-	else if(type == MEDIASUBTYPE_Y411) strncpy(tmpStr, "Y411", maxStr);
-	else if(type == MEDIASUBTYPE_Y41P) strncpy(tmpStr, "Y41P", maxStr);
-	else if(type == MEDIASUBTYPE_Y211) strncpy(tmpStr, "Y211", maxStr);
-	else if(type == MEDIASUBTYPE_AYUV) strncpy(tmpStr, "AYUV", maxStr);
-	else if(type == MEDIASUBTYPE_Y800) strncpy(tmpStr, "Y800", maxStr);
-	else if(type == MEDIASUBTYPE_Y8) strncpy(tmpStr, "Y8", maxStr);
-	else if(type == MEDIASUBTYPE_GREY) strncpy(tmpStr, "GREY", maxStr);
-	else strncpy(tmpStr, "OTHER", maxStr);
+	if( type == MEDIASUBTYPE_RGB24) strncpy_s(tmpStr, "RGB24", maxStr);
+	else if(type == MEDIASUBTYPE_RGB32) strncpy_s(tmpStr, "RGB32", maxStr);
+	else if(type == MEDIASUBTYPE_RGB555)strncpy_s(tmpStr, "RGB555", maxStr);
+	else if(type == MEDIASUBTYPE_RGB565)strncpy_s(tmpStr, "RGB565", maxStr);
+	else if(type == MEDIASUBTYPE_YUY2) strncpy_s(tmpStr, "YUY2", maxStr);
+	else if(type == MEDIASUBTYPE_YVYU) strncpy_s(tmpStr, "YVYU", maxStr);
+	else if(type == MEDIASUBTYPE_YUYV) strncpy_s(tmpStr, "YUYV", maxStr);
+	else if(type == MEDIASUBTYPE_IYUV) strncpy_s(tmpStr, "IYUV", maxStr);
+	else if(type == MEDIASUBTYPE_UYVY) strncpy_s(tmpStr, "UYVY", maxStr);
+	else if(type == MEDIASUBTYPE_YV12) strncpy_s(tmpStr, "YV12", maxStr);
+	else if(type == MEDIASUBTYPE_YVU9) strncpy_s(tmpStr, "YVU9", maxStr);
+	else if(type == MEDIASUBTYPE_Y411) strncpy_s(tmpStr, "Y411", maxStr);
+	else if(type == MEDIASUBTYPE_Y41P) strncpy_s(tmpStr, "Y41P", maxStr);
+	else if(type == MEDIASUBTYPE_Y211) strncpy_s(tmpStr, "Y211", maxStr);
+	else if(type == MEDIASUBTYPE_AYUV) strncpy_s(tmpStr, "AYUV", maxStr);
+	else if(type == MEDIASUBTYPE_Y800) strncpy_s(tmpStr, "Y800", maxStr);
+	else if(type == MEDIASUBTYPE_Y8) strncpy_s(tmpStr, "Y8", maxStr);
+	else if(type == MEDIASUBTYPE_GREY) strncpy_s(tmpStr, "GREY", maxStr);
+	else strncpy_s(tmpStr, "OTHER", maxStr);
 
 	memcpy(typeAsString, tmpStr, sizeof(char)*8);
 }

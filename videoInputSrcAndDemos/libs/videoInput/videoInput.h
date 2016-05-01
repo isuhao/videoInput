@@ -309,6 +309,9 @@ class videoInput{
 
 		bool isDeviceSetup(int deviceID);
 
+		//directly returns the pixels - without any conversion
+		unsigned char * getPixelPointer(int deviceID);
+
 		//Returns the pixels - flipRedAndBlue toggles RGB/BGR flipping - and you can flip the image too
 		unsigned char * getPixels(int deviceID, bool flipRedAndBlue = true, bool flipImage = false);
 
