@@ -1191,7 +1191,7 @@ bool videoInput::getVideoSettingFilter(int deviceID, long Property, long &min, l
 
 	hr = VD->pVideoInputFilter->QueryInterface(IID_IAMVideoProcAmp, (void**)&pAMVideoProcAmp);
 	if(FAILED(hr)){
-		printf("setVideoSetting - QueryInterface Error\n");
+		if(verbose) printf("setVideoSetting - QueryInterface Error\n");
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter->Release();
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter = NULL;
 		return false;
@@ -1259,7 +1259,7 @@ bool videoInput::setVideoSettingFilter(int deviceID, long Property, long lValue,
 
 	hr = getDevice(&VD->pVideoInputFilter, deviceID, VD->wDeviceName, VD->nDeviceName);
 	if (FAILED(hr)){
-		printf("setVideoSetting - getDevice Error\n");
+		if(verbose) printf("setVideoSetting - getDevice Error\n");
 		return false;
 	}
 
@@ -1267,7 +1267,7 @@ bool videoInput::setVideoSettingFilter(int deviceID, long Property, long lValue,
 
 	hr = VD->pVideoInputFilter->QueryInterface(IID_IAMVideoProcAmp, (void**)&pAMVideoProcAmp);
 	if(FAILED(hr)){
-		printf("setVideoSetting - QueryInterface Error\n");
+		if(verbose) printf("setVideoSetting - QueryInterface Error\n");
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter->Release();
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter = NULL;
 		return false;
@@ -1328,7 +1328,7 @@ bool videoInput::setVideoSettingCameraPct(int deviceID, long Property, float pct
 		double halfStep 	= stepAmnt * 0.5;
 		if( mod < halfStep ) rasterValue -= mod;
 		else rasterValue += stepAmnt - mod;
-		printf("RASTER - pctValue is %f - value is %i - step is %i - mod is %i - rasterValue is %i\n", pctValue, value, stepAmnt, mod, rasterValue);
+		if(verbose) printf("RASTER - pctValue is %f - value is %i - step is %i - mod is %i - rasterValue is %i\n", pctValue, value, stepAmnt, mod, rasterValue);
 	}
 
 	return setVideoSettingCamera(deviceID, Property, rasterValue, Flags, false);
@@ -1345,7 +1345,7 @@ bool videoInput::setVideoSettingCamera(int deviceID, long Property, long lValue,
 		if (verbose) printf("Setting video setting %ld.\n", Property);
 		hr = VDList[deviceID]->pVideoInputFilter->QueryInterface(IID_IAMCameraControl, (void**)&pIAMCameraControl);
 		if (FAILED(hr)) {
-			printf("Error\n");
+			if(verbose) printf("Error\n");
 			return false;
 		}
 		else
@@ -1382,7 +1382,7 @@ bool videoInput::getVideoSettingCamera(int deviceID, long Property, long &min, l
 
 	hr = getDevice(&VD->pVideoInputFilter, deviceID, VD->wDeviceName, VD->nDeviceName);
 	if (FAILED(hr)){
-		printf("setVideoSetting - getDevice Error\n");
+		if(verbose) printf("setVideoSetting - getDevice Error\n");
 		return false;
 	}
 
@@ -1390,7 +1390,7 @@ bool videoInput::getVideoSettingCamera(int deviceID, long Property, long &min, l
 
 	hr = VD->pVideoInputFilter->QueryInterface(IID_IAMCameraControl, (void**)&pIAMCameraControl);
 	if(FAILED(hr)){
-		printf("setVideoSetting - QueryInterface Error\n");
+		if(verbose) printf("setVideoSetting - QueryInterface Error\n");
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter->Release();
 		if(VD->pVideoInputFilter)VD->pVideoInputFilter = NULL;
 		return false;
